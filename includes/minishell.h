@@ -1,11 +1,12 @@
-/* ************************************************************************** */ /*                                                                            */
+/* ************************************************************************** */
+/*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: bjanik <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/03 13:42:13 by bjanik            #+#    #+#             */
-/*   Updated: 2017/04/21 16:25:12 by bjanik           ###   ########.fr       */
+/*   Updated: 2017/05/01 17:43:03 by bjanik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +15,7 @@
 # include "libft.h"
 # include <stdio.h>
 # include <sys/stat.h>
+# include <sys/types.h>
 # include <sys/param.h>
 
 # define NB_BUILTINS 5
@@ -22,8 +24,9 @@
 # define PERMISSION 3
 # define CLEAR_SCREEN "\e[1;1H\e[2J"
 # define COMMAND_NOT_FOUND 127
+# define PERMISSION_DENIED 126
 
-extern char			**environ;
+extern char			**g_environ;
 
 typedef struct		s_env
 {
@@ -63,12 +66,18 @@ void				push_back_env(t_env **env, char *env_var);
 void				set_var(t_env **env, char *var);
 void				clear_env(t_env **env);
 void				free_env(t_env **env);
-void				init_minishell(t_shell *shell);
+int					display_env(t_env *env);
+void				ft_perror(char *error);
+t_shell				*init_minishell(char **environ);
 t_env				*create_node(char *env_var);
 t_env				*dup_env(char **environ);
 t_env				*ft_getenv(t_env *env, char *name);
 t_env				*modified_env(t_env *env);
 int					size_env(t_env *env);
+int					check_access(char *cmd, char **cmd_arg, char **envir);
+int					cmd_is_builtin(char **cmd_arg);
+char				**env_to_tab(t_env *env);
+char				**ft_get_cmd(void);
 
 static t_builtins g_builtins[] = {
 	{ "cd", ft_cd },
@@ -78,4 +87,3 @@ static t_builtins g_builtins[] = {
 	{ "unsetenv", ft_unsetenv},
 };
 #endif
-

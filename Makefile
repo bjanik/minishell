@@ -6,7 +6,7 @@
 #    By: bjanik <marvin@42.fr>                      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2017/04/12 10:30:25 by bjanik            #+#    #+#              #
-#    Updated: 2017/04/26 17:38:39 by bjanik           ###   ########.fr        #
+#    Updated: 2017/05/01 17:36:12 by bjanik           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,7 +14,7 @@ NAME = minishell
 
 CC = gcc
 
-FLAGS = -Wall -Wextra -Werror
+FLAGS = -Wall -Wextra -Werror -g
 
 LIBFT  = libft
 
@@ -22,7 +22,11 @@ LIB = libft/libft.a
 
 HEADER = includes
 
-SRCS = srcs/main.c \
+SRCS = srcs/access.c \
+	   srcs/builtins.c \
+	   srcs/command.c \
+	   srcs/errors.c \
+	   srcs/main.c \
 	   srcs/ft_cd.c \
 	   srcs/ft_echo.c \
 	   srcs/ft_env.c \

@@ -1,22 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_memdel.c                                        :+:      :+:    :+:   */
+/*   errors.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: bjanik <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2016/11/04 12:09:44 by bjanik            #+#    #+#             */
-/*   Updated: 2017/04/30 21:03:31 by bjanik           ###   ########.fr       */
+/*   Created: 2017/04/30 18:20:36 by bjanik            #+#    #+#             */
+/*   Updated: 2017/05/01 17:09:12 by bjanik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "minishell.h"
 
-void	ft_memdel(void **ap)
+void	ft_perror(char *error)
 {
-	if (ap && *ap)
-	{
-		free(*ap);
-		*ap = NULL;
-	}
+	ft_putendl_fd(error, 2);
+	exit(-1);
 }

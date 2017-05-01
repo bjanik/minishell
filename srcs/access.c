@@ -1,22 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_memdel.c                                        :+:      :+:    :+:   */
+/*   access.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: bjanik <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2016/11/04 12:09:44 by bjanik            #+#    #+#             */
-/*   Updated: 2017/04/30 21:03:31 by bjanik           ###   ########.fr       */
+/*   Created: 2017/04/30 18:26:17 by bjanik            #+#    #+#             */
+/*   Updated: 2017/05/01 19:40:27 by bjanik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "minishell.h"
 
-void	ft_memdel(void **ap)
+int	check_access(char *cmd, char **cmd_arg, char **envir)
 {
-	if (ap && *ap)
+	if (!access(cmd, F_OK))
 	{
-		free(*ap);
-		*ap = NULL;
+		if (access(cmd, X_OK))
+			return (1);
+		else
+			execve(cmd, cmd_arg, envir);
 	}
+	return (0);
 }

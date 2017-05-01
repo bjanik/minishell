@@ -1,22 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_memdel.c                                        :+:      :+:    :+:   */
+/*   command.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: bjanik <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2016/11/04 12:09:44 by bjanik            #+#    #+#             */
-/*   Updated: 2017/04/30 21:03:31 by bjanik           ###   ########.fr       */
+/*   Created: 2017/05/01 17:34:27 by bjanik            #+#    #+#             */
+/*   Updated: 2017/05/01 19:43:39 by bjanik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "minishell.h"
 
-void	ft_memdel(void **ap)
+char	**ft_get_cmd(void)
 {
-	if (ap && *ap)
-	{
-		free(*ap);
-		*ap = NULL;
-	}
+	char	*tmp;
+	char	*line;
+	char	**cmd;
+
+	get_next_line(0, &line);
+	tmp = line;
+	line = ft_strtrim(tmp);
+	ft_strdel(&tmp);
+	cmd = ft_strtok(line, "\t ");
+	ft_strdel(&line);
+	return (cmd);
 }

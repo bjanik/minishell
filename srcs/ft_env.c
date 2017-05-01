@@ -6,13 +6,38 @@
 /*   By: bjanik <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/12 11:51:23 by bjanik            #+#    #+#             */
-/*   Updated: 2017/04/25 18:33:34 by bjanik           ###   ########.fr       */
+/*   Updated: 2017/05/01 16:12:23 by bjanik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	display_env(t_env *env)
+char	**env_to_tab(t_env *env)
+{
+	char	**tab;
+	t_env	*ptr;
+	int		i;
+
+	i = 0;
+	tab = NULL;
+	ptr = env;
+	if (!(tab = (char**)malloc((size_env(env) + 1) * sizeof(char*))))
+		ft_perror("malloc");
+	while (env)
+	{
+		if (!(tab[i] = (char*)malloc(sizeof(char) * (ft_strlen(env->var_value) +
+							ft_strlen(env->var_name) + 2))))
+			ft_perror("malloc");
+		ft_strcpy(tab[i], env->var_name);
+		ft_strcat(tab[i], "=");
+		ft_strcat(tab[i++], env->var_value);
+		env = env->next;
+	}
+	tab[i] = NULL;
+	return (tab);
+}
+
+int		display_env(t_env *env)
 {
 	while (env)
 	{
@@ -33,20 +58,19 @@ t_env	*ft_getenv(t_env *env, char *name)
 	return (NULL);
 }
 
-
-int	ft_env(t_env **env, char **args)
+int		ft_env(t_env **env, char **args)
 {
 	t_env	*mod_env;
+	int		i;
 
+	i = 1;
 	if (!args[1])
 		return (display_env(*env));
 	if (args[1] && !ft_strcmp(args[1], "-i"))
 	{
 		mod_env = modified_env(*env);
-		clear_env(&mod_env);
-		(!args[2]) ? display_env(mod_env) : 0;
-		return (0);
+		if (!args[2])
+			display_env(mod_env);
 	}
-//	if (args[1] && ft_strcmp("-u", args[1])
 	return (0);
 }

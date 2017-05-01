@@ -6,23 +6,11 @@
 /*   By: bjanik <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/11/30 11:21:13 by bjanik            #+#    #+#             */
-/*   Updated: 2017/04/14 13:23:16 by bjanik           ###   ########.fr       */
+/*   Updated: 2017/04/30 18:43:02 by bjanik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-
-int		init(t_fd *p_fd)
-{
-	if (p_fd->tmp == NULL)
-	{
-		if ((p_fd->tmp = ft_memalloc(TEMP_SIZE + 1)) == NULL)
-			return (0);
-		p_fd->mem_size = TEMP_SIZE + 1;
-		p_fd->nl = NULL;
-	}
-	return (1);
-}
 
 char	*ft_realloc(t_fd *p_fd, size_t *mem_size, int ret)
 {
@@ -50,8 +38,13 @@ int		check_fd(const int fd, t_fd *p_fd, char **line)
 		return (1);
 	if ((ret = read(fd, &c, 1)) > -1)
 	{
-		if (init(p_fd) == 0)
-			return (-1);
+		if (p_fd->tmp == NULL)
+		{
+			if ((p_fd->tmp = ft_memalloc(TEMP_SIZE + 1)) == NULL)
+				return (-1);
+			p_fd->mem_size = TEMP_SIZE + 1;
+			p_fd->nl = NULL;
+		}
 		if (ret > 0)
 			(p_fd->tmp)[0] = c;
 	}
@@ -82,39 +75,43 @@ int		gnl_return_value(t_fd *p_fd, int ret, char **line)
 	return (1);
 }
 
+int		get_line(t_fd *p, char **line)
+{
+	if ((p->nl = ft_strchr(p->tmp, '\n')) != NULL)
+	{
+		if ((*line = ft_strndup(p->tmp, p->nl - p->tmp)) == NULL)
+			return (-1);
+		ft_strcpy(p->tmp, p->nl + 1);
+		return (1);
+	}
+	return (0);
+}
+
 int		get_next_line(const int fd, char **line)
 {
 	char		buff[BUFF_SIZE + 1];
 	int			ret;
 	static t_fd	p_fd[FD_MAX];
+	static t_fd	*p;
+	int			nb;
 
-	if (fd < 0 || fd >= FD_MAX || check_fd(fd, p_fd + fd, line) == -1)
+	p = p_fd + fd;
+	if (fd < 0 || fd >= FD_MAX || check_fd(fd, p, line) == -1)
 		return (-1);
 	*line = NULL;
-	if (((p_fd + fd)->nl = ft_strchr((p_fd + fd)->tmp, '\n')) != NULL)
-	{
-		if ((*line = ft_strndup((p_fd + fd)->tmp, (p_fd + fd)->nl
-						- (p_fd + fd)->tmp)) == NULL)
-			return (-1);
-		ft_strcpy((p_fd + fd)->tmp, (p_fd + fd)->nl + 1);
-		return (1);
-	}
+	if ((nb = get_line(p, line)) == -1 || nb == 1)
+		return (nb);
 	while ((ret = read(fd, buff, BUFF_SIZE)) > 0)
 	{
 		buff[ret] = '\0';
-		if ((p_fd + fd)->mem_size < ft_strlen((p_fd + fd)->tmp) + BUFF_SIZE)
-			if (((p_fd + fd)->tmp = ft_realloc((p_fd + fd),
-							&((p_fd + fd)->mem_size), ret)) == NULL)
+		if (p->mem_size < ft_strlen(p->tmp) + BUFF_SIZE)
+			if ((p->tmp = ft_realloc(p, &(p->mem_size), ret)) == NULL)
 				return (-1);
 		ft_strcat((p_fd + fd)->tmp, buff);
-		if (((p_fd + fd)->nl = ft_strchr((p_fd + fd)->tmp, '\n')) != NULL)
-		{
-			if ((*line = ft_strndup((p_fd + fd)->tmp, (p_fd + fd)->nl
-							- (p_fd + fd)->tmp)) == NULL)
-				return (-1);
-			ft_strcpy((p_fd + fd)->tmp, (p_fd + fd)->nl + 1);
+		if ((nb = get_line(p, line)) == 1)
 			break ;
-		}
+		else
+			return (nb);
 	}
-	return (gnl_return_value((p_fd + fd), ret, line));
+	return (gnl_return_value(p, ret, line));
 }

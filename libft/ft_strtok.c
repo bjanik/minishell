@@ -6,7 +6,7 @@
 /*   By: bjanik <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/25 15:48:45 by bjanik            #+#    #+#             */
-/*   Updated: 2017/04/25 16:30:34 by bjanik           ###   ########.fr       */
+/*   Updated: 2017/04/30 17:57:32 by bjanik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ char		**ft_strtok(char const *str, const char *s)
 	size_t	nb_ltr;
 
 	i = 0;
-	nb_ltr = 0;
+	tab = NULL;
 	if (str == NULL)
 		return (NULL);
 	if ((tab = (char**)malloc((ft_words(str, s) + 1) * sizeof(char*))) == NULL)
@@ -70,4 +70,3 @@ char		**ft_strtok(char const *str, const char *s)
 	tab[i] = NULL;
 	return (tab);
 }
-

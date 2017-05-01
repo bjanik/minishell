@@ -6,7 +6,7 @@
 /*   By: bjanik <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/12 11:55:23 by bjanik            #+#    #+#             */
-/*   Updated: 2017/04/26 17:51:37 by bjanik           ###   ########.fr       */
+/*   Updated: 2017/05/01 14:10:14 by bjanik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,11 +23,16 @@ void	clear_env(t_env **env)
 {
 	t_env	*ptr;
 
-	while (*env)
+	if (env)
 	{
-		ptr = *env;
-		*env = (*env)->next;
-		free_env(&ptr);
+		while (*env)
+		{
+			ptr = (*env)->next;
+			ft_strdel(&(*env)->var_name);
+			ft_strdel(&(*env)->var_value);
+			ft_memdel((void**)env);
+			*env = ptr;
+		}
 	}
 }
 
@@ -53,7 +58,13 @@ void	unset_var(t_env **env, t_env **ptr, t_env *prev)
 	}
 }
 
-int	ft_unsetenv(t_env **env, char **args)
+int		ft_unsetenv_error(void)
+{
+	ft_printf("unsetenv: not enough arguments\n");
+	return (-1);
+}
+
+int		ft_unsetenv(t_env **env, char **args)
 {
 	int		i;
 	t_env	*prev;
@@ -61,10 +72,7 @@ int	ft_unsetenv(t_env **env, char **args)
 
 	i = 1;
 	if (args[0] && !args[1])
-	{
-		ft_printf("unsetenv : not enough arguments\n");
-		return (-1);
-	}
+		return (ft_unsetenv_error());
 	while (args[i])
 	{
 		ptr = *env;

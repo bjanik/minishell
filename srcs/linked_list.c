@@ -6,7 +6,7 @@
 /*   By: bjanik <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/19 13:47:39 by bjanik            #+#    #+#             */
-/*   Updated: 2017/04/25 16:29:59 by bjanik           ###   ########.fr       */
+/*   Updated: 2017/05/01 14:03:19 by bjanik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,7 @@ t_env		*create_node(char *env_var)
 	else
 		env->var_value = ft_strdup("");
 	env->next = NULL;
+	ft_free_string_tab(&splitted_env_var);
 	return (env);
 }
 

@@ -6,7 +6,7 @@
 /*   By: bjanik <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/19 13:59:11 by bjanik            #+#    #+#             */
-/*   Updated: 2017/04/26 15:27:05 by bjanik           ###   ########.fr       */
+/*   Updated: 2017/05/01 17:41:59 by bjanik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,8 +29,12 @@ t_env	*dup_env(char **environ)
 	return (env);
 }
 
-void	init_minishell(t_shell *shell)
+t_shell	*init_minishell(char **environ)
 {
+	t_shell	*shell;
+
+	if ((shell = (t_shell*)malloc(sizeof(t_shell))) == NULL)
+		ft_perror("malloc");
 	shell->env = dup_env(environ);
 	shell->mod_env = NULL;
 	shell->envir = NULL;
@@ -40,4 +44,5 @@ void	init_minishell(t_shell *shell)
 	shell->shell_name = "bsh";
 	shell->exit_status = 0;
 	shell->ret = 0;
+	return (shell);
 }

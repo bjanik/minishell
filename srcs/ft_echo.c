@@ -6,7 +6,7 @@
 /*   By: bjanik <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/12 11:38:09 by bjanik            #+#    #+#             */
-/*   Updated: 2017/04/24 13:19:17 by bjanik           ###   ########.fr       */
+/*   Updated: 2017/04/30 14:14:25 by bjanik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,21 +24,6 @@ static void	print_env_var(t_env *env, char *arg)
 		env = env->next;
 	}
 }
-
-/*void	list_files(void)
-{
-	DIR				*dir_stream;
-	struct dirent	 *dir_content;
-	
-	if (!(dir_stream = opendir(".")))
-		return ;
-	while ((dir_content = readdir(dir_stream)))
-	{
-		if (dir_content->d_name[0] != '.')
-			ft_printf("%s ", dir_content->d_name);
-	}
-	closedir(dir_stream);
-}*/
 
 int			ft_echo(t_env **env, char **args)
 {

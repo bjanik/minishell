@@ -6,31 +6,11 @@
 /*   By: bjanik <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/03 13:42:02 by bjanik            #+#    #+#             */
-/*   Updated: 2017/04/26 17:51:41 by bjanik           ###   ########.fr       */
+/*   Updated: 2017/05/01 17:42:40 by bjanik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-static void	ft_perror(char *error)
-{
-	perror(error);
-	exit(-1);
-}
-
-int			cmd_is_builtin(char **cmd_arg)
-{
-	int	i;
-
-	i = 0;
-	while (i < NB_BUILTINS)
-	{
-		if (!ft_strcmp(cmd_arg[0], g_builtins[i].builtin_name))
-			return (i);
-		i++;
-	}
-	return (-1);
-}
 
 static char	**get_cmd_path(t_env *env)
 {
@@ -39,95 +19,55 @@ static char	**get_cmd_path(t_env *env)
 
 	paths = NULL;
 	if ((path = ft_getenv(env, "PATH")))
-		paths = ft_strsplit(path->var_value , ':');
+		paths = ft_strsplit(path->var_value, ':');
 	return (paths);
 }
 
-char	**env_to_tab(t_env *env)
+static int	execute_cmd(char **paths, char **cmd, char **envir)
 {
-	char	**tab;
-	t_env	*ptr;
-	int		i;
+	int			i;
+	char		*full_cmd_path;
+	int			no_perm;
 
 	i = 0;
-	tab = NULL;
-	ptr = env;
-	if (!(tab = (char**)malloc((size_env(env) + 1) * sizeof(char*))))
-		ft_perror("malloc");
-	while (env)
-	{
-		if (!(tab[i] = (char*)malloc(sizeof(char) * (ft_strlen(env->var_value) +
-							ft_strlen(env->var_name) + 2))))
-			ft_perror("malloc");
-		ft_strcpy(tab[i], env->var_name);
-		ft_strcat(tab[i], "=");
-		ft_strcat(tab[i++], env->var_value);
-		env = env->next;
-	}
-	tab[i] = NULL;
-	return (tab);
-}
-
-int			execute_cmd(char **paths, char **cmd_arg, char **envir)
-{
-	int		i;
-	char	*full_cmd_path;
-
-	i = 0;
+	no_perm = 0;
 	full_cmd_path = NULL;
-	while (paths[i])
+	no_perm = check_access(cmd[0], cmd, envir);
+	while (paths && paths[i] && !no_perm)
 	{
-		if (cmd_arg[0][0] != '/')
-			full_cmd_path = ft_strnjoin(paths[i], 2, "/", cmd_arg[0]);
-		else
-			full_cmd_path = cmd_arg[0];
-		ft_printf("%s\n", cmd_arg[0]);
-		if (execve(full_cmd_path, cmd_arg, envir) != -1)
-		{
-			ft_strdel(&full_cmd_path);
-			return (1);
-		}
+		full_cmd_path = ft_strnjoin(paths[i], 2, "/", cmd[0]);
+		no_perm = check_access(full_cmd_path, cmd, envir);
 		ft_strdel(&full_cmd_path);
 		i++;
 	}
-	return (0);
+	return (no_perm) ? PERMISSION_DENIED : COMMAND_NOT_FOUND;
 }
 
-char	**ft_get_cmd(void)
+static void	fork_and_execute(t_shell *shell)
 {
-	char	*tmp;
-	char	*line;
-	char	**cmd;
+	int	ret;
 
-	get_next_line(0, &line);
-	tmp = line;
-	line = ft_strtrim(tmp);
-	free(tmp);
-	cmd = ft_strtok(line, "\t ");
-	free(line);
-	return (cmd);
-}
-
-void	fork_and_execute(t_shell *shell)
-{
+	ret = 0;
 	if ((shell->ret = fork()) < 0)
-		ft_perror("fork");
+		ft_perror("Can't fork");
 	if (!shell->ret)
 	{
 		shell->paths = get_cmd_path(shell->env);
-		if (!shell->paths && shell->cmd[0][0] != '/')
-			ft_printf("bsh :command not found: %s\n", shell->cmd[0]);
 		shell->envir = env_to_tab(shell->env);
-		if (shell->cmd && execute_cmd(shell->paths, shell->cmd, shell->envir) < 1)
-			ft_printf("bsh :command not found: %s\n", shell->cmd[0]);
-		exit(COMMAND_NOT_FOUND);
+		ret = execute_cmd(shell->paths, shell->cmd, shell->envir);
+		(ret == COMMAND_NOT_FOUND) ? ft_printf("bsh :command not found: %s\n",
+				shell->cmd[0]) : ft_printf("bsh :permission denied: %s\n",
+					shell->cmd[0]);
+		exit(ret);
 	}
 	else
+	{
 		waitpid(shell->ret, &shell->status, WUNTRACED);
-
+		ft_free_string_tab(&shell->paths);
+	}
 }
 
-int	minishell_loop(t_shell *shell)
+static int	minishell_loop(t_shell *shell)
 {
 	int	i;
 
@@ -138,7 +78,7 @@ int	minishell_loop(t_shell *shell)
 		shell->cmd = ft_get_cmd();
 		if (shell->cmd[0] && ((i = cmd_is_builtin(shell->cmd)) != -1)
 				&& ft_strcmp(shell->cmd[0], "exit"))
-		shell->status = g_builtins[i].builtins(&shell->env, shell->cmd);
+			shell->status = g_builtins[i].builtins(&shell->env, shell->cmd);
 		else if (shell->cmd[0] && ft_strcmp(shell->cmd[0], "exit"))
 			fork_and_execute(shell);
 		else if (shell->cmd[0] && !ft_strcmp(shell->cmd[0], "exit"))
@@ -152,19 +92,19 @@ int	minishell_loop(t_shell *shell)
 	}
 	return (0);
 }
-int			main(int argc, char **argv)
+
+int			main(int argc, char **argv, char **environ)
 {
-	t_shell	b_shell;
 	t_shell	*shell;
 	int		minishell_ret;
 
 	(void)argv;
+	shell = NULL;
 	if (argc != 1)
 		minishell_ret = COMMAND_NOT_FOUND;
 	else
 	{
-		shell = &b_shell;
-		init_minishell(shell);
+		shell = init_minishell(environ);
 		minishell_ret = minishell_loop(shell);
 	}
 	return (minishell_ret);
