@@ -6,108 +6,86 @@
 /*   By: bjanik <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/12 11:52:11 by bjanik            #+#    #+#             */
-/*   Updated: 2017/05/01 17:10:21 by bjanik           ###   ########.fr       */
+/*   Updated: 2017/05/09 19:48:50 by bjanik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static char	*ft_concat_path(char *path, t_env *env)
+static char	*ft_get_path(char *path, t_env *env, char **cmd)
 {
 	char	*pwd;
 	char	*fullpath;
-	char	*tmp;
 	char	*s;
 	t_env	*p;
 
-	if ((s = ft_strchr(path, '~')))
+	p = ft_getenv(env, "HOME");
+	if (!path || (path && !ft_strcmp(path, "~")))
+		return (set_home_path(env, path));
+	else if (cmd[1] && !ft_strcmp(cmd[1], "-"))
+		return (set_oldpwd_path(env, path));
+	else if ((s = ft_strchr(cmd[1], '~')) && p)
 	{
-		tmp = path;
-		path = ft_memalloc(MAXPATHLEN);
-		if ((p = ft_getenv(env, "HOME")))
-		{
-			ft_strncpy(tmp, path, s - tmp + 1);
-			ft_strcpy(path, p->var_value);
-			ft_strcat(path, s + 1);
-		}
-		ft_strdel(&tmp);
-		return (path);
+		if (!(path = ft_memalloc(MAXPATHLEN)))
+			ft_perror("malloc failed");
+		ft_strcpy(path, p->var_value);
+		ft_strcat(path, s + 1);
 	}
-	pwd = getcwd(NULL, MAXPATHLEN);
-	fullpath = ft_strnjoin(pwd, 2, "/", path);
-	free(pwd);
-	ft_strdel(&path);
-	return (fullpath);
+	else if (cmd[1] && cmd[1][0] != '/')
+	{
+		pwd = getcwd(NULL, MAXPATHLEN);
+		fullpath = ft_strnjoin(pwd, 2, "/", cmd[1]);
+		free(pwd);
+		return (fullpath);
+	}
+	return (path);
 }
 
 static int	ft_cd_error_msg(int error, char *cmd_arg, char **path)
 {
 	if (error == INEXISTENT)
-	{
-		ft_putstr_fd("cd: no such file or directory: ", 2);
-		ft_putendl_fd(cmd_arg, 2);
-	}
+		ft_error_msg("cd: no such file or directory: ", cmd_arg);
 	if (error == MULTIPLE_ARGS)
-	{
-		ft_putstr_fd("cd: string not in pwd: ", 2);
-		ft_putendl_fd(cmd_arg, 2);
-	}
+		ft_error_msg("cd: string not in pwd: ", cmd_arg);
 	if (error == PERMISSION)
-	{
-		ft_putstr_fd("cd: permission denied: ", 2);
-		ft_putendl_fd(cmd_arg, 2);
-	}
-	ft_strdel(path);
+		ft_error_msg("cd: permission denied: ", *path);
+	if (error == NOT_DIRECTORY)
+		ft_error_msg("cd: not a directory: ", cmd_arg);
+	(cmd_arg != *path) ? ft_strdel(path) : 0;
 	return (1);
 }
 
-static int	ft_cd_error(char **cmd_arg, char **path, t_env *env)
+static int	ft_cd_error(char **cmd_arg, char **path)
 {
-	if (cmd_arg[1])
-		*path = ft_strdup(cmd_arg[1]);
-	if (cmd_arg[1] && *path[0] != '/')
-		*path = ft_concat_path(*path, env);
+	struct stat	info;
+
 	if (cmd_arg[1] && cmd_arg[2])
 		return (ft_cd_error_msg(MULTIPLE_ARGS, cmd_arg[1], path));
-	if (cmd_arg[1] && access(*path, F_OK) < 0 &&
-			ft_strcmp(cmd_arg[1], "~") && ft_strcmp(cmd_arg[1], "-"))
+	if (cmd_arg[1] && access(*path, F_OK) < 0)
 		return (ft_cd_error_msg(INEXISTENT, cmd_arg[1], path));
-	if (cmd_arg[1] && access(*path, X_OK) < 0 &&
-			ft_strcmp(cmd_arg[1], "~") && ft_strcmp(cmd_arg[1], "-"))
+	stat(*path, &info);
+	if (!S_ISDIR(info.st_mode))
+		return (ft_cd_error_msg(NOT_DIRECTORY, cmd_arg[1], path));
+	if (cmd_arg[1] && access(*path, X_OK) < 0)
 		return (ft_cd_error_msg(PERMISSION, cmd_arg[1], path));
 	return (0);
 }
 
-void		update_wd(t_env **env, char **wd)
+int			ft_cd(t_env **env, char **cmd)
 {
-	set_var(env, wd[0]);
-	set_var(env, wd[1]);
-	ft_strdel(&wd[0]);
-	ft_strdel(&wd[1]);
-}
-
-int			ft_cd(t_env **env, char **cmd_arg)
-{
-	t_env	*p;
 	char	*wd[2];
 	char	*path;
 
-	path = NULL;
-	if (ft_cd_error(cmd_arg, &path, *env))
+	path = cmd[1];
+	path = ft_get_path(path, *env, cmd);
+	if (!path || ft_cd_error(cmd, &path))
 		return (1);
 	wd[0] = getcwd(NULL, MAXPATHLEN);
 	wd[0] = ft_strjoin_and_free("OLDPWD=", wd[0], 2);
-	if ((!cmd_arg[1] || !ft_strcmp(cmd_arg[1], "~")) &&
-			(p = ft_getenv(*env, "HOME")))
-		chdir(p->var_value);
-	else if ((cmd_arg[1] && !ft_strcmp(cmd_arg[1], "-")) &&
-			(p = ft_getenv(*env, "OLDPWD")))
-		chdir(p->var_value);
-	else
-		chdir(path);
+	chdir(path);
 	wd[1] = getcwd(NULL, MAXPATHLEN);
 	wd[1] = ft_strjoin_and_free("PWD=", wd[1], 2);
 	update_wd(env, wd);
-	ft_strdel(&path);
+	(cmd[1] != path) ? ft_strdel(&path) : 0;
 	return (0);
 }

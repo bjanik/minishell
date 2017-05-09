@@ -6,7 +6,7 @@
 /*   By: bjanik <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/03 13:42:02 by bjanik            #+#    #+#             */
-/*   Updated: 2017/05/01 17:42:40 by bjanik           ###   ########.fr       */
+/*   Updated: 2017/05/09 14:17:50 by bjanik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,8 @@ static int	execute_cmd(char **paths, char **cmd, char **envir)
 	i = 0;
 	no_perm = 0;
 	full_cmd_path = NULL;
-	no_perm = check_access(cmd[0], cmd, envir);
+	if ((no_perm = check_access(cmd[0], cmd, envir)) == -1)
+		return (0);
 	while (paths && paths[i] && !no_perm)
 	{
 		full_cmd_path = ft_strnjoin(paths[i], 2, "/", cmd[0]);
@@ -55,9 +56,12 @@ static void	fork_and_execute(t_shell *shell)
 		shell->paths = get_cmd_path(shell->env);
 		shell->envir = env_to_tab(shell->env);
 		ret = execute_cmd(shell->paths, shell->cmd, shell->envir);
-		(ret == COMMAND_NOT_FOUND) ? ft_printf("bsh :command not found: %s\n",
-				shell->cmd[0]) : ft_printf("bsh :permission denied: %s\n",
-					shell->cmd[0]);
+		if (ret == COMMAND_NOT_FOUND)
+			ft_error_msg("bsh :command not found: ", shell->cmd[0]);
+		else if (ret == PERMISSION_DENIED)
+			ft_error_msg("bsh :permission denied: ", shell->cmd[0]);
+		else
+			ft_printf("bsh : %s: is a directory\n", shell->cmd[0]);
 		exit(ret);
 	}
 	else
@@ -74,7 +78,7 @@ static int	minishell_loop(t_shell *shell)
 	i = 0;
 	while (42)
 	{
-		ft_putstr("$> ");
+		minishell_prompt();
 		shell->cmd = ft_get_cmd();
 		if (shell->cmd[0] && ((i = cmd_is_builtin(shell->cmd)) != -1)
 				&& ft_strcmp(shell->cmd[0], "exit"))

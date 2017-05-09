@@ -6,7 +6,7 @@
 /*   By: bjanik <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/19 13:47:39 by bjanik            #+#    #+#             */
-/*   Updated: 2017/05/01 14:03:19 by bjanik           ###   ########.fr       */
+/*   Updated: 2017/05/09 21:04:02 by bjanik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,10 @@ int			size_env(t_env *env)
 
 static void	copy_content(t_env *env, t_env *mod_env)
 {
-	mod_env->var_name = ft_strdup(env->var_name);
-	mod_env->var_value = ft_strdup(env->var_value);
+	if (!(mod_env->var_name = ft_strdup(env->var_name)))
+		ft_perror("malloc failed");
+	if (!(mod_env->var_value = ft_strdup(env->var_value)))
+		ft_perror("malloc failed");
 	mod_env->next = NULL;
 }
 
@@ -43,14 +45,14 @@ t_env		*modified_env(t_env *env)
 		if (!mod_env)
 		{
 			if (!(mod_env = (t_env*)malloc(sizeof(t_env))))
-				exit(-1);
+				ft_perror("malloc failed");
 			copy_content(env, mod_env);
 			ptr = mod_env;
 		}
 		else
 		{
 			if (!(ptr->next = (t_env*)malloc(sizeof(t_env))))
-				exit(-1);
+				ft_perror("malloc failed");
 			ptr = ptr->next;
 			copy_content(env, ptr);
 		}
@@ -63,15 +65,21 @@ t_env		*create_node(char *env_var)
 {
 	t_env	*env;
 	char	**splitted_env_var;
-
+	
+	if (!env_var)
+		return (NULL);
 	splitted_env_var = ft_strsplit(env_var, '=');
 	if (!(env = (t_env*)malloc(sizeof(t_env))))
-		return (NULL);
-	env->var_name = ft_strdup(splitted_env_var[0]);
+		ft_perror("malloc failed");
+	if (!(env->var_name = ft_strdup(splitted_env_var[0])))
+		ft_perror("malloc failed");
 	if (splitted_env_var[1])
-		env->var_value = ft_strdup(splitted_env_var[1]);
-	else
-		env->var_value = ft_strdup("");
+	{
+		if (!(env->var_value = ft_strdup(splitted_env_var[1])))
+			ft_perror("malloc failed");
+	}
+	else if (!(env->var_value = ft_strdup("")))
+		ft_perror("malloc failed");
 	env->next = NULL;
 	ft_free_string_tab(&splitted_env_var);
 	return (env);

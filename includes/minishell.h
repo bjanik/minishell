@@ -6,27 +6,25 @@
 /*   By: bjanik <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/03 13:42:13 by bjanik            #+#    #+#             */
-/*   Updated: 2017/05/01 17:43:03 by bjanik           ###   ########.fr       */
+/*   Updated: 2017/05/09 14:17:33 by bjanik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
 # include "libft.h"
-# include <stdio.h>
 # include <sys/stat.h>
 # include <sys/types.h>
 # include <sys/param.h>
+# include <signal.h>
 
 # define NB_BUILTINS 5
 # define INEXISTENT 1
 # define MULTIPLE_ARGS 2
 # define PERMISSION 3
-# define CLEAR_SCREEN "\e[1;1H\e[2J"
+# define NOT_DIRECTORY 4
 # define COMMAND_NOT_FOUND 127
 # define PERMISSION_DENIED 126
-
-extern char			**g_environ;
 
 typedef struct		s_env
 {
@@ -42,7 +40,6 @@ typedef struct		s_shell
 	char			**envir;
 	char			**cmd;
 	char			**paths;
-	pid_t			shell_pid;
 	int				exit_status;
 	int				status;
 	char			*shell_name;
@@ -68,6 +65,7 @@ void				clear_env(t_env **env);
 void				free_env(t_env **env);
 int					display_env(t_env *env);
 void				ft_perror(char *error);
+void				ft_error_msg(char *error, char *cmd);
 t_shell				*init_minishell(char **environ);
 t_env				*create_node(char *env_var);
 t_env				*dup_env(char **environ);
@@ -78,6 +76,10 @@ int					check_access(char *cmd, char **cmd_arg, char **envir);
 int					cmd_is_builtin(char **cmd_arg);
 char				**env_to_tab(t_env *env);
 char				**ft_get_cmd(void);
+void				update_wd(t_env **env, char **wd);
+char				*set_home_path(t_env *env, char *path);
+char				*set_oldpwd_path(t_env *env, char *path);
+void				minishell_prompt(void);
 
 static t_builtins g_builtins[] = {
 	{ "cd", ft_cd },

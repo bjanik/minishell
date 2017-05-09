@@ -6,13 +6,21 @@
 /*   By: bjanik <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/12 11:51:23 by bjanik            #+#    #+#             */
-/*   Updated: 2017/05/01 16:12:23 by bjanik           ###   ########.fr       */
+/*   Updated: 2017/05/02 15:06:24 by bjanik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-char	**env_to_tab(t_env *env)
+static int	ft_env_usage(char c)
+{
+	ft_putstr_fd("env: illegal option -- ", 2);
+	ft_putchar_fd(c, 2);
+	ft_putstr_fd("\nusage: env [-i] [-u name]\n\t   [name=value ...]\n", 2);
+	return (1);
+}
+
+char		**env_to_tab(t_env *env)
 {
 	char	**tab;
 	t_env	*ptr;
@@ -37,7 +45,7 @@ char	**env_to_tab(t_env *env)
 	return (tab);
 }
 
-int		display_env(t_env *env)
+int			display_env(t_env *env)
 {
 	while (env)
 	{
@@ -47,7 +55,7 @@ int		display_env(t_env *env)
 	return (0);
 }
 
-t_env	*ft_getenv(t_env *env, char *name)
+t_env		*ft_getenv(t_env *env, char *name)
 {
 	while (env)
 	{
@@ -58,19 +66,17 @@ t_env	*ft_getenv(t_env *env, char *name)
 	return (NULL);
 }
 
-int		ft_env(t_env **env, char **args)
+int			ft_env(t_env **env, char **args)
 {
-	t_env	*mod_env;
-	int		i;
+	int	i;
 
 	i = 1;
 	if (!args[1])
 		return (display_env(*env));
+	if (args[1][0] == '-' &&
+			ft_strcmp(args[1], "-i") && ft_strcmp(args[1], "-u"))
+		return (ft_env_usage(args[1][1]));
 	if (args[1] && !ft_strcmp(args[1], "-i"))
-	{
-		mod_env = modified_env(*env);
-		if (!args[2])
-			display_env(mod_env);
-	}
+		return (0);
 	return (0);
 }

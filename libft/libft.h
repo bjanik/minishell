@@ -6,7 +6,7 @@
 /*   By: bjanik <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/11/03 16:51:57 by bjanik            #+#    #+#             */
-/*   Updated: 2017/04/25 16:02:00 by bjanik           ###   ########.fr       */
+/*   Updated: 2017/05/05 14:49:20 by bjanik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@
 # define BACK_YEL   "\x1B[43m"
 # define BACK_CYN   "\x1B[46m"
 # define BOLD_CYAN  "\x1B[1m\033[36m"
+# define BOLD_GRN  "\x1B[1m\033[32m"
 # define RESET "\x1B[0m"
 
 typedef struct		s_dlst
@@ -135,5 +136,4 @@ int					ft_valid_file(char *path);
 int					ft_printf(const char *format, ...);
 int					get_next_line(int fd, char **line);
 void				ft_display_string_tab(char **tab);
-
 #endif
