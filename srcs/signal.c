@@ -1,22 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_putendl_fd.c                                    :+:      :+:    :+:   */
+/*   signal.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: bjanik <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2016/11/03 18:11:43 by bjanik            #+#    #+#             */
-/*   Updated: 2017/05/19 14:26:08 by bjanik           ###   ########.fr       */
+/*   Created: 2017/05/10 14:32:17 by bjanik            #+#    #+#             */
+/*   Updated: 2017/05/19 13:58:52 by bjanik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "minishell.h"
 
-void	ft_putendl_fd(char const *s, int fd)
+extern pid_t	g_pid;
+
+void	ft_sighandler(int signum)
 {
-	if (s)
-	{
-		ft_putstr_fd(s, fd);
-		ft_putchar_fd('\n', fd);
-	}
+	if (signum == SIGINT)
+		ft_printf("\n");
+	if (!g_pid)
+		minishell_prompt();
 }

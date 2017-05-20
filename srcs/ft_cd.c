@@ -6,7 +6,7 @@
 /*   By: bjanik <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/12 11:52:11 by bjanik            #+#    #+#             */
-/*   Updated: 2017/05/09 19:48:50 by bjanik           ###   ########.fr       */
+/*   Updated: 2017/05/20 16:26:19 by bjanik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,8 +43,12 @@ static char	*ft_get_path(char *path, t_env *env, char **cmd)
 
 static int	ft_cd_error_msg(int error, char *cmd_arg, char **path)
 {
-	if (error == INEXISTENT)
+	if (cmd_arg && error == INEXISTENT && ft_strcmp(cmd_arg, "-"))
 		ft_error_msg("cd: no such file or directory: ", cmd_arg);
+	if (!cmd_arg && error == INEXISTENT)
+		ft_error_msg("cd: no such file or directory: ", *path);
+	if (cmd_arg && !ft_strcmp(cmd_arg, "-") && error == INEXISTENT)
+		ft_error_msg("cd: no such file or directory: ", *path);
 	if (error == MULTIPLE_ARGS)
 		ft_error_msg("cd: string not in pwd: ", cmd_arg);
 	if (error == PERMISSION)
@@ -61,7 +65,7 @@ static int	ft_cd_error(char **cmd_arg, char **path)
 
 	if (cmd_arg[1] && cmd_arg[2])
 		return (ft_cd_error_msg(MULTIPLE_ARGS, cmd_arg[1], path));
-	if (cmd_arg[1] && access(*path, F_OK) < 0)
+	if (access(*path, F_OK) < 0)
 		return (ft_cd_error_msg(INEXISTENT, cmd_arg[1], path));
 	stat(*path, &info);
 	if (!S_ISDIR(info.st_mode))

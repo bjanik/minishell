@@ -6,7 +6,7 @@
 /*   By: bjanik <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/04 14:14:03 by bjanik            #+#    #+#             */
-/*   Updated: 2017/05/09 19:51:13 by bjanik           ###   ########.fr       */
+/*   Updated: 2017/05/20 17:55:01 by bjanik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,4 +38,12 @@ char	*set_oldpwd_path(t_env *env, char *path)
 		return (NULL);
 	}
 	return (path);
+}
+
+void	update_wd(t_env **env, char **wd)
+{
+	set_var(env, wd[0]);
+	set_var(env, wd[1]);
+	ft_strdel(&wd[0]);
+	ft_strdel(&wd[1]);
 }

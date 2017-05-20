@@ -6,18 +6,17 @@
 #    By: bjanik <marvin@42.fr>                      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2017/04/12 10:30:25 by bjanik            #+#    #+#              #
-#    Updated: 2017/05/05 14:32:57 by bjanik           ###   ########.fr        #
+#    Updated: 2017/05/20 14:20:14 by bjanik           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = minishell
 
 CC = gcc
-
-FLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror
 
 LIBFT  = libft
-
+LIBFT_INC  = libft/includes
 LIB = libft/libft.a
 
 HEADER = includes
@@ -37,6 +36,7 @@ SRC_NAME = errors.c \
 	   init_minishell.c \
 	   linked_list.c \
 	   tools.c \
+	   signal.c \
 
 OBJ_NAME = $(SRC_NAME:.c=.o)
 
@@ -49,13 +49,9 @@ $(NAME) : $(OBJ)
 	make -C $(LIBFT)
 	$(CC) $(FLAGS) $(OBJ) $(LIB) -o $(NAME)
 
-$(OBJ) : $(OBJ_PATH)
-
-$(OBJ_PATH) :
-	mkdir -p $(OBJ_PATH)
-
 $(OBJ_PATH)/%.o: $(SRC_PATH)/%.c
-	$(CC) $(FLAGS) -I$(HEADER) -I$(LIBFT) -c $< -o $@
+	@mkdir -p $(OBJ_PATH) 2> /dev/null
+	$(CC) $(CFLAGS) -I$(HEADER) -I$(LIBFT_INC) -c $< -o $@
 
 clean :
 	rm -rf $(OBJ_PATH)

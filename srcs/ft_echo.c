@@ -6,7 +6,7 @@
 /*   By: bjanik <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/12 11:38:09 by bjanik            #+#    #+#             */
-/*   Updated: 2017/05/09 14:15:25 by bjanik           ###   ########.fr       */
+/*   Updated: 2017/05/18 14:41:44 by bjanik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,7 @@ static void	echo_loop(char **args, int i, int j, t_env **env)
 			{
 				n = ft_len(args[i] + j + 1);
 				print_env_var(*env, args[i] + j, n);
+				(args[i][j] == '$' && !args[i][j + 1]) ? ft_putchar('$') : 0;
 				j += n + 1;
 				if (args[i][j + ft_strlen(args[i] + j)])
 					break ;

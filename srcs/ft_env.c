@@ -6,7 +6,7 @@
 /*   By: bjanik <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/12 11:51:23 by bjanik            #+#    #+#             */
-/*   Updated: 2017/05/02 15:06:24 by bjanik           ###   ########.fr       */
+/*   Updated: 2017/05/18 14:43:48 by bjanik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,27 +22,28 @@ static int	ft_env_usage(char c)
 
 char		**env_to_tab(t_env *env)
 {
-	char	**tab;
+	char	**array;
 	t_env	*ptr;
 	int		i;
 
 	i = 0;
-	tab = NULL;
+	array = NULL;
 	ptr = env;
-	if (!(tab = (char**)malloc((size_env(env) + 1) * sizeof(char*))))
+	if (!(array = (char**)malloc((size_env(env) + 1) * sizeof(char*))))
 		ft_perror("malloc");
 	while (env)
 	{
-		if (!(tab[i] = (char*)malloc(sizeof(char) * (ft_strlen(env->var_value) +
-							ft_strlen(env->var_name) + 2))))
+		if (!(array[i] = (char*)malloc(sizeof(char) *
+						(ft_strlen(env->var_value) +
+						ft_strlen(env->var_name) + 2))))
 			ft_perror("malloc");
-		ft_strcpy(tab[i], env->var_name);
-		ft_strcat(tab[i], "=");
-		ft_strcat(tab[i++], env->var_value);
+		ft_strcpy(array[i], env->var_name);
+		ft_strcat(array[i], "=");
+		ft_strcat(array[i++], env->var_value);
 		env = env->next;
 	}
-	tab[i] = NULL;
-	return (tab);
+	array[i] = NULL;
+	return (array);
 }
 
 int			display_env(t_env *env)

@@ -6,7 +6,7 @@
 /*   By: bjanik <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/19 13:59:11 by bjanik            #+#    #+#             */
-/*   Updated: 2017/05/04 19:57:35 by bjanik           ###   ########.fr       */
+/*   Updated: 2017/05/18 15:02:32 by bjanik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,10 +38,9 @@ t_shell	*init_minishell(char **environ)
 	shell->env = dup_env(environ);
 	shell->mod_env = NULL;
 	shell->envir = NULL;
-	shell->cmd = NULL;
+	shell->cmds = NULL;
 	shell->paths = NULL;
 	shell->shell_name = "bsh";
 	shell->exit_status = 0;
-	shell->ret = 0;
 	return (shell);
 }

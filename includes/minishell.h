@@ -6,7 +6,7 @@
 /*   By: bjanik <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/03 13:42:13 by bjanik            #+#    #+#             */
-/*   Updated: 2017/05/09 14:17:33 by bjanik           ###   ########.fr       */
+/*   Updated: 2017/05/18 18:45:56 by bjanik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,11 @@
 # include <sys/stat.h>
 # include <sys/types.h>
 # include <sys/param.h>
+# include <term.h>
+# include <termcap.h>
+# include <termios.h>
+# include <curses.h>
+# include <ncurses.h>
 # include <signal.h>
 
 # define NB_BUILTINS 5
@@ -25,6 +30,8 @@
 # define NOT_DIRECTORY 4
 # define COMMAND_NOT_FOUND 127
 # define PERMISSION_DENIED 126
+# define MAX_CMD_LENGHT 2048
+# define MAX_NB_COMMANDS 10000
 
 typedef struct		s_env
 {
@@ -38,12 +45,11 @@ typedef struct		s_shell
 	t_env			*env;
 	t_env			*mod_env;
 	char			**envir;
-	char			**cmd;
+	char			**cmds;
 	char			**paths;
 	int				exit_status;
 	int				status;
 	char			*shell_name;
-	pid_t			ret;
 }					t_shell;
 
 typedef struct		s_builtins
@@ -73,13 +79,15 @@ t_env				*ft_getenv(t_env *env, char *name);
 t_env				*modified_env(t_env *env);
 int					size_env(t_env *env);
 int					check_access(char *cmd, char **cmd_arg, char **envir);
-int					cmd_is_builtin(char **cmd_arg);
+int					cmd_is_builtin(char **cmd);
 char				**env_to_tab(t_env *env);
-char				**ft_get_cmd(void);
+char				**ft_get_cmds(void);
+char				**get_cmd_path(t_env *env);
 void				update_wd(t_env **env, char **wd);
 char				*set_home_path(t_env *env, char *path);
 char				*set_oldpwd_path(t_env *env, char *path);
 void				minishell_prompt(void);
+void				ft_sighandler(int signum);
 
 static t_builtins g_builtins[] = {
 	{ "cd", ft_cd },

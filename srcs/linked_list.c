@@ -6,7 +6,7 @@
 /*   By: bjanik <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/19 13:47:39 by bjanik            #+#    #+#             */
-/*   Updated: 2017/05/09 21:04:02 by bjanik           ###   ########.fr       */
+/*   Updated: 2017/05/20 18:04:36 by bjanik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,10 +65,12 @@ t_env		*create_node(char *env_var)
 {
 	t_env	*env;
 	char	**splitted_env_var;
-	
+
 	if (!env_var)
 		return (NULL);
 	splitted_env_var = ft_strsplit(env_var, '=');
+	if (!splitted_env_var[0])
+		return (NULL);
 	if (!(env = (t_env*)malloc(sizeof(t_env))))
 		ft_perror("malloc failed");
 	if (!(env->var_name = ft_strdup(splitted_env_var[0])))
