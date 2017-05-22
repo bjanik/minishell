@@ -6,7 +6,7 @@
 /*   By: bjanik <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/03 13:42:13 by bjanik            #+#    #+#             */
-/*   Updated: 2017/05/18 18:45:56 by bjanik           ###   ########.fr       */
+/*   Updated: 2017/05/22 17:55:11 by bjanik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,8 +30,6 @@
 # define NOT_DIRECTORY 4
 # define COMMAND_NOT_FOUND 127
 # define PERMISSION_DENIED 126
-# define MAX_CMD_LENGHT 2048
-# define MAX_NB_COMMANDS 10000
 
 typedef struct		s_env
 {

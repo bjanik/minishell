@@ -6,7 +6,7 @@
 /*   By: bjanik <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/12 11:54:24 by bjanik            #+#    #+#             */
-/*   Updated: 2017/05/20 18:03:49 by bjanik           ###   ########.fr       */
+/*   Updated: 2017/05/22 17:44:02 by bjanik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,25 @@ static int	setenv_no_value(char **split, char *var)
 	return (0);
 }
 
+static int	set_new_var(t_env *ptr, char **spvar)
+{
+	if (!spvar[1] && !ft_strcmp(ptr->var_name, spvar[0]))
+	{
+		ft_free_string_tab(&spvar);
+		ft_strdel(&ptr->var_value);
+		ptr->var_value = ft_strdup("");
+		return (1);
+	}
+	if (spvar[1] && !ft_strcmp(ptr->var_name, spvar[0]))
+	{
+		ft_strdel(&ptr->var_value);
+		ptr->var_value = (spvar[1]) ? ft_strdup(spvar[1]) : ft_strdup("");
+		ft_free_string_tab(&spvar);
+		return (1);
+	}
+	return (0);
+}
+
 void		set_var(t_env **env, char *var)
 {
 	char	**spvar;
@@ -29,7 +48,7 @@ void		set_var(t_env **env, char *var)
 
 	ptr = *env;
 	spvar = ft_strsplit(var, '=');
-	if (!spvar[0])
+	if (!spvar[0] || var[0] == '=')
 	{
 		ft_free_string_tab(&spvar);
 		return ;
@@ -38,20 +57,8 @@ void		set_var(t_env **env, char *var)
 		return ;
 	while (ptr)
 	{
-		if (spvar[0] && !spvar[1] && !ft_strcmp(ptr->var_name, spvar[0]))
-		{
-			ft_free_string_tab(&spvar);
-			ft_strdel(&ptr->var_value);
-			ptr->var_value = ft_strdup("");
+		if (set_new_var(ptr, spvar))
 			return ;
-		}
-		if (spvar[0] && spvar[1] && !ft_strcmp(ptr->var_name, spvar[0]))
-		{
-			ft_strdel(&ptr->var_value);
-			ptr->var_value = (spvar[1]) ? ft_strdup(spvar[1]) : ft_strdup("");
-			ft_free_string_tab(&spvar);
-			return ;
-		}
 		ptr = ptr->next;
 	}
 	push_back_env(env, var);

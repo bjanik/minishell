@@ -6,7 +6,7 @@
 /*   By: bjanik <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/03 13:42:02 by bjanik            #+#    #+#             */
-/*   Updated: 2017/05/19 13:48:03 by bjanik           ###   ########.fr       */
+/*   Updated: 2017/05/22 17:55:13 by bjanik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,21 +16,29 @@ pid_t	g_pid;
 
 static int	execute_cmd(char **paths, char **cmd, char **envir)
 {
-	int			i;
-	char		*full_cmd_path;
-	int			no_perm;
+	int		i;
+	char	*full_cmd_path;
+	int		no_perm;
+	char	*pwd;
 
 	i = 0;
 	no_perm = 0;
 	full_cmd_path = NULL;
-	if ((no_perm = check_access(cmd[0], cmd, envir)) == -1)
-		return (0);
-	while (paths && paths[i] && !no_perm)
+	if (cmd[0][0] == '/')
+		if (check_access(cmd[0], cmd, envir) == -1)
+			return (-1);
+	while (paths && paths[i] && !no_perm && ft_strncmp(cmd[0], "./", 2))
 	{
-		full_cmd_path = ft_strnjoin(paths[i], 2, "/", cmd[0]);
+		full_cmd_path = ft_strnjoin(paths[i++], 2, "/", cmd[0]);
 		no_perm = check_access(full_cmd_path, cmd, envir);
 		ft_strdel(&full_cmd_path);
-		i++;
+	}
+	if (!ft_strncmp(cmd[0], "./", 2))
+	{
+		pwd = getcwd(NULL, MAXPATHLEN);
+		full_cmd_path = ft_strnjoin(pwd, 2, "/", cmd[0] + 2);
+		no_perm = check_access(full_cmd_path, cmd, envir);
+		ft_strdel(&full_cmd_path);
 	}
 	return (no_perm) ? PERMISSION_DENIED : COMMAND_NOT_FOUND;
 }
