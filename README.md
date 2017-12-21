@@ -10,8 +10,8 @@ The goal of this project is to code a very basic shell, without line editing.
 
 ## Mandatory part
 Implement following builtins : echo, env, setenv, unsetenv, cd
-
 Launch simple commands : No redirections, no pipes, just command with its arguments
+Handling ownership
 
 ## Optional features
 SEMI ';' command separator
