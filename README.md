@@ -6,7 +6,7 @@ Grade: 114/100
 
 Minishell is, after ft_ls, the second UNIX Branch project and the first shell project.
 
-# Mandatory part
+## Mandatory part
         Builtin : echo, env, setenv, unsetenv, cd
         
         
