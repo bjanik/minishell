@@ -19,4 +19,3 @@ SEMI ';' command separator
 Handling signal SIGINT (ctrl + C)
 
         
-        
